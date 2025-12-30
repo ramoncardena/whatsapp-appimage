@@ -2,7 +2,9 @@ const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
 // Disable sandbox to avoid "The SUID sandbox helper binary was found, but is not configured correctly" issues on some distros.
+// These must be set before app.ready.
 app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('disable-setuid-sandbox');
 
 function createWindow() {
   const win = new BrowserWindow({
