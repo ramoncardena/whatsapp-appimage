@@ -28,7 +28,7 @@
     "messaging"
   ],
   "author": "Ramon Cardena <info@ramoncardena.com>",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "electron": "^39.2.7",
