@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-appimage",
-  "version": "1.1.0",
+  "version": "1.4.0",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -17,8 +17,17 @@
       "icon": "icon.png"
     }
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "whatsapp",
+    "linux",
+    "electron",
+    "appimage",
+    "desktop",
+    "privacy",
+    "client",
+    "messaging"
+  ],
+  "author": "Ramon Cardena <info@ramoncardena.com>",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {

@@ -10,7 +10,7 @@
 
 A privacy-focused, lightweight Electron wrapper packaged as a universal **AppImage**. Runs instantly on **Ubuntu**, **Debian**, **Fedora**, **Arch Linux**, **Linux Mint**, **Manjaro**, and more—no installation required. 
 
-Includes essential features missing from the web version, like **System Tray support** and a unique **Privacy "Boss Mode"** to instantly blur your chats.
+Includes essential features missing from the web version, like **System Tray support**, **Native Notifications**, and a unique **Privacy "Boss Mode"** to instantly blur your chats.
 
 ## Features
 
@@ -32,7 +32,7 @@ Includes essential features missing from the web version, like **System Tray sup
     ```
 3.  Run it:
     ```bash
-    ./WhatsApp-1.1.0.AppImage
+    ./WhatsApp-1.2.0.AppImage
     ```
 
 ### Shortcuts & Tips
