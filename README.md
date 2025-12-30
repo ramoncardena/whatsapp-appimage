@@ -1,12 +1,24 @@
 # WhatsApp AppImage for Linux
 
-A lightweight, unofficial Electron wrapper for WhatsApp Web, packaged as an AppImage for easy usage on Linux distributions.
+![GitHub license](https://img.shields.io/badge/license-ISC-blue.svg)
+![Electron](https://img.shields.io/badge/Electron-39.x-47848F?logo=electron&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-linux-lightgrey.svg)
+![AppImage](https://img.shields.io/badge/Package-AppImage-red.svg)
+
+
+**The ultimate unofficial WhatsApp Desktop client for Linux.** 
+
+A privacy-focused, lightweight Electron wrapper packaged as a universal **AppImage**. Runs instantly on **Ubuntu**, **Debian**, **Fedora**, **Arch Linux**, **Linux Mint**, **Manjaro**, and more—no installation required. 
+
+Includes essential features missing from the web version, like **System Tray support** and a unique **Privacy "Boss Mode"** to instantly blur your chats.
 
 ## Features
 
 - 🚀 **Zero Install**: Just download (or build) the AppImage and run.
 - 📱 **Native Experience**: Runs in its own window, separate from your browser tabs.
-- 🔒 **Sandboxed**: Isolate WhatsApp from your main browser context.
+- � **System Tray**: Minimizes to tray to keep running in the background.
+- 🕵️ **Privacy "Boss Mode"**: Instantly blur the screen with `Ctrl+Shift+P` (or `Cmd+Shift+P`).
+- �🔒 **Sandboxed**: Isolate WhatsApp from your main browser context.
 - 🔧 **Customizable**: Open source, so you can tweak the Electron wrapper as needed.
 
 ## Usage
@@ -20,8 +32,13 @@ A lightweight, unofficial Electron wrapper for WhatsApp Web, packaged as an AppI
     ```
 3.  Run it:
     ```bash
-    ./WhatsApp-1.0.2.AppImage
+    ./WhatsApp-1.1.0.AppImage
     ```
+
+### Shortcuts & Tips
+
+- **Privacy Blur**: Press `Ctrl+Shift+P` (or `Cmd` on Mac) to instantly blur/unblur the window. Great for privacy!
+- **Minimize to Tray**: Closing the window will minimize it to the system tray. Right-click the tray icon to Quit completely.
 
 ### Troubleshooting: Sandbox Errors
 
