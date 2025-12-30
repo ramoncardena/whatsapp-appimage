@@ -1,0 +1,13 @@
+node_modules
+dist
+release
+*.AppImage
+*.snap
+*.deb
+*.rpm
+*.dmg
+*.exe
+.DS_Store
+.idea
+.vscode
+*.log
