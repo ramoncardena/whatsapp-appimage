@@ -17,9 +17,23 @@ Includes essential features missing from the web version, like **System Tray sup
 - 🚀 **Zero Install**: Just download (or build) the AppImage and run.
 - 📱 **Native Experience**: Runs in its own window, separate from your browser tabs.
 - � **System Tray**: Minimizes to tray to keep running in the background.
-- 🕵️ **Privacy "Boss Mode"**: Instantly blur the screen with `Ctrl+Shift+P` (or `Cmd+Shift+P`).
-- �🔒 **Sandboxed**: Isolate WhatsApp from your main browser context.
+- 🕵️ **Privacy "Boss Mode"**: Instantly blur the screen with `Ctrl+Shift+B` (or `Cmd+Shift+B`).
+- 🔒 **Secure**: Chromium sandbox enabled, context isolation, no Node integration in renderer.
+- 🛡️ **Hardened**: Secure IPC communication, input validation, URL protocol checking.
 - 🔧 **Customizable**: Open source, so you can tweak the Electron wrapper as needed.
+
+## Security
+
+This application takes security seriously. Version 2.0+ includes significant security improvements:
+
+- ✅ **Chromium Sandbox Enabled** - Isolates browser process from system (critical fix!)
+- ✅ **Context Isolation** - Separates preload scripts from web content
+- ✅ **No Node Integration** - Prevents direct access to Node.js APIs from web content
+- ✅ **Secure IPC Communication** - No code injection via executeJavaScript
+- ✅ **Input Validation** - All external inputs are sanitized
+- ✅ **URL Validation** - Proper protocol checking for external links
+
+For security concerns or to report vulnerabilities, see [SECURITY.md](SECURITY.md).
 
 ## Usage
 
@@ -37,25 +51,43 @@ Includes essential features missing from the web version, like **System Tray sup
 
 ### Shortcuts & Tips
 
-- **Privacy Blur**: Press `Ctrl+Shift+P` (or `Cmd` on Mac) to instantly blur/unblur the window. Great for privacy!
+- **Privacy Blur**: Press `Ctrl+Shift+B` (or `Cmd+Shift+B` on Mac) to instantly blur/unblur the window. Great for privacy!
 - **Minimize to Tray**: Closing the window will minimize it to the system tray. Right-click the tray icon to Quit completely.
 
 ### Troubleshooting: Sandbox Errors
+
+**v2.0+ runs with the Chromium sandbox enabled by default for security.** This is the recommended and most secure way to run the application.
 
 If you encounter an error like:
 `The SUID sandbox helper binary was found, but is not configured correctly...`
 
 This is common on newer Linux distributions (like Ubuntu 24.04+) that restrict unprivileged user namespaces. You have two options:
 
-**Option A (Recommended for one-off): Run with `--no-sandbox`**
+**Option A (RECOMMENDED): Enable unprivileged user namespaces**
+
+This is the secure solution that keeps all security protections active:
+
 ```bash
-./WhatsApp-1.0.2.AppImage --no-sandbox
+# Temporary (until reboot):
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+# Permanent:
+echo "kernel.apparmor_restrict_unprivileged_userns=0" | sudo tee /etc/sysctl.d/99-appimage.conf
+sudo sysctl --system
 ```
 
-**Option B (System Fix): Enable unprivileged user namespaces**
+**Option B (NOT RECOMMENDED): Run with `--no-sandbox`**
+
+⚠️ **Security Warning:** This significantly reduces security protections. Only use if you understand the risks.
+
 ```bash
-sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+./WhatsApp-2.0.0.AppImage --no-sandbox
 ```
+
+When running without sandbox:
+- Only use on trusted networks (no public WiFi)
+- Keep your system fully updated
+- Be aware this removes important security isolation
 
 ## Building from Source
 

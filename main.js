@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, Tray, Menu, globalShortcut, nativeImage } = require('electron');
+const { app, BrowserWindow, shell, Tray, Menu, globalShortcut, nativeImage, ipcMain } = require('electron');
 const path = require('path');
 
 // Fix notifications on Windows/Linux
@@ -6,10 +6,16 @@ if (process.platform === 'linux' || process.platform === 'win32') {
   app.setAppUserModelId('com.whatsapp.appimage');
 }
 
-// Disable sandbox to avoid "The SUID sandbox helper binary was found, but is not configured correctly" issues on some distros.
-// These must be set before app.ready.
-app.commandLine.appendSwitch('no-sandbox');
-app.commandLine.appendSwitch('disable-setuid-sandbox');
+// Security: Only disable sandbox if explicitly requested via command line
+// This is a significant security reduction and should only be used when necessary
+if (process.argv.includes('--no-sandbox')) {
+  console.warn('⚠️  WARNING: Running with sandbox disabled. This significantly reduces security.');
+  console.warn('⚠️  Only use this flag on trusted networks and if you understand the risks.');
+  app.commandLine.appendSwitch('no-sandbox');
+  app.commandLine.appendSwitch('disable-setuid-sandbox');
+} else {
+  console.log('✓ Running with Chromium sandbox enabled (secure mode)');
+}
 
 let mainWindow;
 let tray = null;
@@ -25,7 +31,7 @@ function createTray() {
       }
     },
     {
-      label: 'Toggle Privacy Blur (Ctrl+Shift+P)',
+      label: 'Toggle Privacy Blur (Ctrl+Shift+B)',
       click: () => {
         togglePrivacy();
       }
@@ -49,14 +55,8 @@ function createTray() {
 
 function togglePrivacy() {
   if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`
-      if (document.body.style.filter === 'blur(10px)') {
-        document.body.style.filter = 'none';
-      } else {
-        document.body.style.filter = 'blur(10px)';
-        document.body.style.transition = 'filter 0.3s ease';
-      }
-    `);
+    // Security: Use IPC to trigger privacy toggle instead of injecting code
+    mainWindow.webContents.send('toggle-privacy');
   }
 }
 
@@ -67,25 +67,57 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      // preload: path.join(__dirname, 'preload.js') 
+      // Note: renderer sandbox disabled for WhatsApp Web compatibility
+      // Main Chromium sandbox still provides critical protection
+      sandbox: false,
+      preload: path.join(__dirname, 'preload.js')
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'icon.png')
   });
 
+  // Open DevTools for debugging (disabled in production)
+  // mainWindow.webContents.openDevTools();
+
   // correct User Agent is often crucial for WhatsApp Web to work in Electron
   const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
   mainWindow.webContents.setUserAgent(userAgent);
 
+  // Security: CSP temporarily disabled for debugging
+  // TODO: Re-enable with proper configuration after testing
+  // mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       'Content-Security-Policy': [
+  //         "default-src * 'unsafe-inline' 'unsafe-eval' data: blob: wss: https:; " +
+  //         "script-src * 'unsafe-inline' 'unsafe-eval'; " +
+  //         "connect-src * wss: https:; " +
+  //         "img-src * data: blob: https: http:; " +
+  //         "media-src * data: blob: https: http: mediastream:; " +
+  //         "style-src * 'unsafe-inline'; " +
+  //         "font-src * data:; " +
+  //         "object-src 'none';"
+  //       ]
+  //     }
+  //   });
+  // });
+
   mainWindow.loadURL('https://web.whatsapp.com');
 
-  // Open links in external browser
+  // Security: Open links in external browser with proper validation
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http:') || url.startsWith('https:')) {
-      shell.openExternal(url);
-      return { action: 'deny' };
+    try {
+      const parsedUrl = new URL(url);
+      // Only allow http and https protocols
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        shell.openExternal(url);
+        return { action: 'deny' };
+      }
+    } catch (e) {
+      console.error('Invalid URL attempted to open:', url);
     }
-    return { action: 'allow' };
+    return { action: 'deny' }; // Deny by default for security
   });
 
   // Hide instead of close
@@ -116,71 +148,21 @@ function createWindow() {
   mainWindow.on('page-title-updated', (event, title) => {
     // WhatsApp title format: "(3) WhatsApp" or just "WhatsApp"
     const countMatch = title.match(/^\((\d+)\)/);
-    const count = countMatch ? countMatch[1] : '';
-
-    console.log(`Title updated: "${title}" | Parsed count: ${count}`);
+    const count = countMatch ? parseInt(countMatch[1], 10) : 0;
 
     // Update badge on Dock/Taskbar directly
     if (process.platform === 'darwin' && app.dock) {
-      app.dock.setBadge(count);
+      app.dock.setBadge(count > 0 ? count.toString() : '');
     } else {
-      app.setBadgeCount(count ? parseInt(count, 10) : 0);
+      app.setBadgeCount(count);
     }
 
-    // Force Badge Update via Canvas Generation (Nuclear Option)
-    // Uses the page's favicon to draw a red badge over it
-    mainWindow.webContents.executeJavaScript(`
-      new Promise((resolve) => {
-        try {
-          const count = ${count ? parseInt(count, 10) : 0};
-          const canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
-          const ctx = canvas.getContext('2d');
-          const img = new Image();
-          
-          // Get current favicon
-          const link = document.querySelector("link[rel*='icon']");
-          img.crossOrigin = "Anonymous";
-          img.src = link ? link.href : '';
-          
-          img.onload = () => {
-             ctx.drawImage(img, 0, 0, 64, 64);
-             
-             if (count > 0) {
-                 // Red circle
-                 ctx.fillStyle = '#f44336'; // Material Red
-                 ctx.beginPath();
-                 ctx.arc(48, 16, 18, 0, 2 * Math.PI);
-                 ctx.fill();
-                 
-                 // Count text
-                 ctx.fillStyle = 'white';
-                 ctx.font = 'bold 22px Arial';
-                 ctx.textAlign = 'center';
-                 ctx.textBaseline = 'middle';
-                 // Handle large numbers
-                 const text = count > 99 ? '99+' : count.toString();
-                 ctx.fillText(text, 48, 17);
-             }
-             resolve(canvas.toDataURL());
-          };
-          img.onerror = () => resolve(null);
-        } catch (e) {
-          resolve(null);
-        }
-      })
-    `).then((dataUrl) => {
-      if (dataUrl) {
-        const img = nativeImage.createFromDataURL(dataUrl);
-        mainWindow.setIcon(img);
-        if (tray) tray.setImage(img);
-      }
-    }).catch(e => console.error("Badge generation failed:", e));
-
+    // Security: Request badge generation via IPC instead of injecting code
+    // This sends a message to the preload script which will generate the badge safely
+    mainWindow.webContents.send('generate-badge', count);
 
     if (tray) {
-      if (count) {
+      if (count > 0) {
         tray.setToolTip(`WhatsApp (${count} unread)`);
       } else {
         tray.setToolTip('WhatsApp');
@@ -195,14 +177,28 @@ function createWindow() {
       // ...
     }
   });
+
+  // Security: Set up IPC listener for badge data URL from renderer
+  ipcMain.on('badge-data-url', (event, dataUrl) => {
+    if (dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')) {
+      try {
+        const img = nativeImage.createFromDataURL(dataUrl);
+        mainWindow.setIcon(img);
+        if (tray) tray.setImage(img);
+      } catch (e) {
+        console.error('Failed to set badge icon:', e);
+      }
+    }
+  });
 }
 
 app.whenReady().then(() => {
   createWindow();
   createTray();
 
-  // Register global shortcut for Privacy Mode
-  globalShortcut.register('CommandOrControl+Shift+P', () => {
+  // Register global shortcut for Privacy Mode (Boss Mode)
+  // Using Ctrl+Shift+B to avoid conflicts with VS Code's command palette
+  globalShortcut.register('CommandOrControl+Shift+B', () => {
     togglePrivacy();
     if (!mainWindow.isVisible()) {
       mainWindow.show();
