@@ -14,6 +14,9 @@ A privacy-focused, lightweight Electron wrapper packaged as a universal **AppIma
 
 Includes essential features missing from the web version, like **System Tray support**, **Native Notifications**, and a unique **Privacy "Boss Mode"** to instantly blur your chats.
 
+![WhatsDesk main window](screenshots/main.png)
+*The main window (contacts and messages are demo content).*
+
 ## Features
 
 - 🚀 **Zero Install**: Just download (or build) the AppImage and run.
