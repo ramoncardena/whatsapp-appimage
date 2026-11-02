@@ -1,7 +1,7 @@
 {
   "name": "whatsdesk",
   "productName": "WhatsDesk",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Unofficial desktop client for WhatsApp Web on Linux, with privacy features",
   "main": "main.js",
   "scripts": {
@@ -12,10 +12,20 @@
   "build": {
     "appId": "com.ramoncardena.whatsdesk",
     "productName": "WhatsDesk",
+    "files": [
+      "!screenshots${/*}",
+      "!scripts${/*}"
+    ],
     "linux": {
       "target": "AppImage",
       "category": "Network",
-      "icon": "icon.png"
+      "icon": "icon.png",
+      "extraFiles": [
+        {
+          "from": "build/com.ramoncardena.whatsdesk.appdata.xml",
+          "to": "usr/share/metainfo/com.ramoncardena.whatsdesk.appdata.xml"
+        }
+      ]
     }
   },
   "keywords": [

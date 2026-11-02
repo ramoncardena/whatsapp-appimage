@@ -33,10 +33,14 @@ trap 'rm -rf "$WORKDIR"' EXIT
 (cd "$WORKDIR" && "$APPIMAGE" --appimage-extract >/dev/null)
 # --appimage-extract creates directories as 0700, which appimagetool rejects since other users couldn't run the app
 chmod -R a+rX "$WORKDIR/squashfs-root"
+# electron-builder only puts the .desktop file in the AppImage root, but AppStream validation
+# (run by the appimage.github.io tests) looks for it in usr/share/applications
+mkdir -p "$WORKDIR/squashfs-root/usr/share/applications"
+cp "$WORKDIR"/squashfs-root/*.desktop "$WORKDIR/squashfs-root/usr/share/applications/"
 
 # Build in the work dir and only replace the original once it succeeded.
 # The output keeps the final file name because the .zsync file references it.
-(cd "$WORKDIR" && ARCH="$ARCH" "$APPIMAGETOOL" --no-appstream -u "$UPDATE_INFO" squashfs-root "$(basename "$APPIMAGE")")
+(cd "$WORKDIR" && ARCH="$ARCH" "$APPIMAGETOOL" -u "$UPDATE_INFO" squashfs-root "$(basename "$APPIMAGE")")
 mv -f "$WORKDIR/$(basename "$APPIMAGE")" "$APPIMAGE"
 mv -f "$WORKDIR/$(basename "$APPIMAGE").zsync" "$APPIMAGE.zsync"
 

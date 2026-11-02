@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ramoncardena.whatsdesk</id>
+  <name>WhatsDesk</name>
+  <summary>Unofficial desktop client for WhatsApp Web</summary>
+  <developer id="com.ramoncardena">
+    <name>Ramon Cardena</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>
+      WhatsDesk runs WhatsApp Web in its own window, separate from your browser tabs, with the
+      features the web version is missing on Linux.
+    </p>
+    <ul>
+      <li>Minimizes to the system tray and keeps running in the background</li>
+      <li>Native desktop notifications and an unread badge on the window and tray icon</li>
+      <li>Privacy "Boss Mode": blur the window instantly with Ctrl+Shift+B</li>
+      <li>Chromium sandbox and context isolation enabled, no Node integration for web content</li>
+    </ul>
+    <p>
+      WhatsDesk is not affiliated with, endorsed by, or connected to WhatsApp or Meta.
+      WhatsApp is a trademark of WhatsApp LLC.
+    </p>
+  </description>
+  <launchable type="desktop-id">whatsdesk.desktop</launchable>
+  <url type="homepage">https://github.com/ramoncardena/whatsdesk</url>
+  <url type="bugtracker">https://github.com/ramoncardena/whatsdesk/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window with a chat open (demo content)</caption>
+      <image>https://raw.githubusercontent.com/ramoncardena/whatsdesk/main/screenshots/main.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Logging in on first launch</caption>
+      <image>https://raw.githubusercontent.com/ramoncardena/whatsdesk/main/screenshots/login.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-audio">intense</content_attribute>
+    <content_attribute id="social-contacts">intense</content_attribute>
+  </content_rating>
+  <releases>
+    <release version="2.2.1" date="2026-11-02"/>
+    <release version="2.2.0" date="2026-11-02"/>
+    <release version="2.1.1" date="2026-10-26"/>
+    <release version="2.1.0" date="2026-10-26"/>
+    <release version="2.0.0" date="2026-01-12"/>
+  </releases>
+</component>
