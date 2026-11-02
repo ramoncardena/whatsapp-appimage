@@ -31,7 +31,7 @@ trap 'rm -rf "$WORKDIR"' EXIT
 
 # --appimage-extract always extracts into ./squashfs-root
 (cd "$WORKDIR" && "$APPIMAGE" --appimage-extract >/dev/null)
-# electron-builder packs directories as 0700, which appimagetool rejects since other users couldn't run the app
+# --appimage-extract creates directories as 0700, which appimagetool rejects since other users couldn't run the app
 chmod -R a+rX "$WORKDIR/squashfs-root"
 
 # Build in the work dir and only replace the original once it succeeded.

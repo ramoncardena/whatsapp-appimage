@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-11-02
+
+### Added
+
+- The AppImage now embeds update information and each release includes a `.zsync` file, so WhatsDesk can be updated with AppImageUpdate, Gear Lever and similar tools, downloading only the parts that changed
+
+### Changed
+
+- The AppImage uses the current static AppImage runtime, so it no longer needs `libfuse2` installed on the system
+- The AppImage is smaller (about 106 MB instead of 115 MB)
+
 ## [2.1.1] - 2026-10-26
 
 ### Fixed
